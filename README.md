@@ -1,2 +1,2 @@
 # Docker Compose Yaml
-Deploy Elastic ,Kibana, Logstash with ELK
+ELKDockerCompose.yaml: Elastic ,Kibana, Logstash 
