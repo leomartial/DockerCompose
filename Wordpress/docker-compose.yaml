@@ -1,7 +1,7 @@
 services:
-  database:
-    container_name: database
-    image: mysql:8.0
+  mysql:
+    container_name: mysql
+    image: mysql:8.0-oracle
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: $MYSQL_DATABASE
@@ -10,33 +10,40 @@ services:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
       MYSQL_AUTH_PLUGIN: $MYSQL_AUTH_PLUGIN
     volumes:
-      - database:/var/lib/mysql
+      - mysql_db:/var/lib/mysql
     networks:
       - wordpress-network
 
   wordpress:
     depends_on:
-      - database
+      - mysql
     container_name: wordpress
-    image: wordpress:6.2.0
+    image: wordpress:6.2.0-fpm-alpine
     restart: unless-stopped
-    ports:
-      - 8080:80
     environment:
-      WORDPRESS_DB_HOST: database
+      WORDPRESS_DB_HOST: mysql
       WORDPRESS_DB_USER: $MYSQL_USER
       WORDPRESS_DB_PASSWORD: $MYSQL_PASSWORD
       WORDPRESS_DB_NAME: $MYSQL_DATABASE
     volumes:
-      - wordpress:/var/www/html
+      - html:/var/www/html
+    networks:
+      - wordpress-network
+
+  nginx:
+    depends_on:
+      - wordpress
+    container_name: nginx
+    image: nginx:1.23.4-alpine
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - html:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
     networks:
       - wordpress-network
 
 volumes:
-  wordpress:
-  database:
-
-networks:
-  wordpress-network:
-    name: wordpress-network
-    driver: bridge
+  html:
+  mysql_db:
