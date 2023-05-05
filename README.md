@@ -1,2 +1,4 @@
 # Docker Compose Yaml
-ELKDockerCompose.yaml: Elastic , Kibana, Logstash (8.7.0)
+Yaml File for:
+- Elastic , Kibana, Logstash (8.7.0)
+- wordpress 6.2, mysql 8.0
