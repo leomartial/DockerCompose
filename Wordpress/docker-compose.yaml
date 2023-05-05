@@ -3,16 +3,17 @@ services:
     container_name: database
     image: mysql:8.0
     restart: unless-stopped
-    env_file: database.env
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_AUTH_PLUGIN: ${MYSQL_AUTH_PLUGIN}
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_USER: $MYSQL_USER
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_AUTH_PLUGIN: $MYSQL_AUTH_PLUGIN
     volumes:
       - database:/var/lib/mysql
-  
+    networks:
+      - wordpress-network
+
   wordpress:
     depends_on:
       - database
@@ -23,16 +24,19 @@ services:
       - 8080:80
     environment:
       WORDPRESS_DB_HOST: database
-      WORDPRESS_DB_USER: ${MYSQL_USER}
-      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
-      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: $MYSQL_USER
+      WORDPRESS_DB_PASSWORD: $MYSQL_PASSWORD
+      WORDPRESS_DB_NAME: $MYSQL_DATABASE
     volumes:
       - wordpress:/var/www/html
+    networks:
+      - wordpress-network
 
 volumes:
   wordpress:
   database:
 
 networks:
-  name: wordpress
-  driver: bridge
+  wordpress-network:
+    name: wordpress-network
+    driver: bridge
