@@ -1,0 +1,36 @@
+services:
+  postgresql:
+    container_name: postgresql
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - network
+  odoo:
+    depends_on:
+      - postgresql
+    container_name: odoo
+    image: odoo:16.0
+    restart: unless-stopped
+    ports:
+      - "8069:8069"
+    environment:
+      HOST: postgresql
+      USER: $POSTGRES_USER
+      PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - data:/var/lib/odoo
+    networks:
+      - network
+
+volumes:
+  data:
+  db_data:
+
+networks:
+  network:
